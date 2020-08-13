@@ -6,7 +6,7 @@ ZLibrary.Asia is the biggest ebook library which has two main servers:
 - b-ok.asia
 - booksc.xyz
 
-b-ok can be used for downloading books based various filters whereas booksc contains articles and research papers.
+b-ok.asia can be used for downloading books based various filters whereas booksc contains articles and research papers.
 
 ## About Scraper
 
@@ -29,4 +29,4 @@ The data fetched contains the following columns :
 
 Book is downloaded based on user confirmation. The file format is either epub or pdf.
 
-**Note:** One book is uploaded for a sample and not each book, for obvious reasons.
+**Note:** One book is uploaded for sample and not all the books - for obvious reasons.
