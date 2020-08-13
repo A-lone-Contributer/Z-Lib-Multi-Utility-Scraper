@@ -6,6 +6,7 @@ import csv
 import time
 import shutil
 import pyfiglet
+from collections import OrderedDict
 from urllib.request import urlopen, Request, urlretrieve
 from urllib.error import HTTPError, URLError
 from bs4 import BeautifulSoup, NavigableString, Tag
@@ -219,11 +220,16 @@ def bookMetaData(dirlink, title):
 
         # added them to dictionary with None values
         for col in not_present:
-            metadict[col] = None
+            metadict[col] = 'NaN'
 
     # sort the data again for sanity
-    metadict = dict(sorted(metadict.items()))
+    metadict = OrderedDict(sorted(metadict.items()))
+
+    # cleaning 'File' column
     metadict['File'] = metadict['File'].replace(",", "")
+
+    # adding title column to the front of the dictionary
+    metadict = OrderedDict([('Title', title)] + list(metadict.items()))
 
     csv_file = "metadata.csv"  # name of the csv file
 
