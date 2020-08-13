@@ -4,7 +4,6 @@ import random
 import re
 import csv
 import time
-import shutil
 import pyfiglet
 from collections import OrderedDict
 from urllib.request import urlopen, Request, urlretrieve
