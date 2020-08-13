@@ -236,7 +236,7 @@ def bookMetaData(dirlink, title):
 
     # open the file in append mode and write the dictionary content
     try:
-        with open(csv_file, 'a+') as csvfile:
+        with open(csv_file, 'a+', newline='') as csvfile:
             writer = csv.DictWriter(
                 csvfile, fieldnames=metadict.keys(), delimiter=',')
             if csvfile.tell() == 0:
