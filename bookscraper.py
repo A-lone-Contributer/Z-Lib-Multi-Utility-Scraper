@@ -110,7 +110,7 @@ def bookLinkRetrieval(bs):
                 ref = ts.get('href')
                 BookLink = "https://b-ok.asia" + ref
 
-            print("Title of the book: " + title)
+            print("Title of the book: " + title+"\n")
             print("Book link: " + BookLink)
             print("=" * 40)
 
@@ -141,7 +141,6 @@ def bookLinkRetrieval(bs):
 
             # calling bookMetaData for fetching book details
             bookMetaData(dirlink, title)
-            print("*" * 40)
 
 
 # Function to fetch book metadata and create excel file
