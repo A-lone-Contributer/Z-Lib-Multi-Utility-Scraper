@@ -226,7 +226,7 @@ def bookMetaData(dirlink, title):
 
     # cleaning 'File' and 'Categories' Column
     metadict['File'] = metadict['File'].replace(",", "")
-    metadict['Categories'] = metadict['Categories'].replace("\\", "")
+    metadict['Categories'] = metadict['Categories'].replace("\\", ",")
 
     # adding title column to the front of the dictionary
     metadict = OrderedDict([('Title', title)] + list(metadict.items()))
