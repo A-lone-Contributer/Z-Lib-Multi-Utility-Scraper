@@ -44,7 +44,7 @@ def load_user_agents(uafile):
 
 def userMenu():
     """
-    User Input and Initial Reterieval
+    User Input and Initial Retrieval
     """
 
     # Number of retries after URLError
@@ -91,7 +91,7 @@ def userMenu():
     bookLinkRetrieval(bs)
 
 
-# Utility function for Book Title Reterieval and Direct-link Parsing
+# Utility function for Book Title Retrieval and Direct-link Parsing
 def bookLinkRetrieval(bs):
     """
     bs : Soup object having parsed HTML for the user query
