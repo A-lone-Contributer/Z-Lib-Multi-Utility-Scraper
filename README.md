@@ -24,6 +24,7 @@ The data fetched contains the following columns :
 - Language
 - Pages (Number of Pages)
 - Publisher
+- Year
 
 ### File
 
