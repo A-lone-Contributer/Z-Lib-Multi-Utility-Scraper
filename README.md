@@ -29,4 +29,4 @@ The data fetched contains the following columns :
 
 Book is downloaded based on user confirmation. The file format is either epub or pdf.
 
-Note: One book is uploaded for a sample and not each book, for obvious reasons.
+**Note:** One book is uploaded for a sample and not each book, for obvious reasons.
