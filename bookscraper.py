@@ -17,8 +17,6 @@ print(ascii_banner)
 user_agents_file = os.path.join(os.path.dirname(__file__), 'user_agents.txt')
 
 # Utlity function to get the user agent
-
-
 def get_user_agent():
     """
     Load the User Agent File
@@ -27,8 +25,6 @@ def get_user_agent():
     return user_agent
 
 # Utility function to get random UserAgent from the file
-
-
 def load_user_agents(uafile):
     """
     uafile : string
