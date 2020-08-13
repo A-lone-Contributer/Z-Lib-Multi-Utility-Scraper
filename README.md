@@ -6,11 +6,11 @@ ZLibrary.Asia is the biggest ebook library which has two main servers:
 - b-ok.asia
 - booksc.xyz
 
-b-ok.asia can be used for downloading books based various filters whereas booksc contains articles and research papers.
+b-ok.asia can be used for downloading books based various filters whereas booksc.xyz contains articles and research papers.
 
 ## About Scraper
 
-This is a multiple utility scraper which can fetche the metadata of books in a csv file. Also, user can download the desired books in one click.
+This is a multiple utility scraper which can fetch the metadata of books in a csv file. Also, user can download the desired books in one click.
 Note that, this scraper is just for b-ok.asia but it is very easy to switch to booksc.xyz by changing search url in the code.
 
 ## Outputs
