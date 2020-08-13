@@ -148,7 +148,8 @@ def bookMetaData(dirlink, title):
     dirlink: Direct link to the book
     title: Title of the book
     """
-
+    i=0
+                
     # fetching the metadata for each of the books
     try:
         print("=" * 40)
@@ -180,7 +181,7 @@ def bookMetaData(dirlink, title):
         "Publisher",
         "Year"]
 
-    try      
+    try:    
         # fetch the book details by requesting directlink of booko
         for child in soup.find('div', {'class': 'bookDetailsBox'}).children:
             
