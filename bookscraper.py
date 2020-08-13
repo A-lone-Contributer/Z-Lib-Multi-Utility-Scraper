@@ -181,23 +181,25 @@ def bookMetaData(dirlink, title):
         "Publisher",
         "Year"]
 
-    # fetch the book details by requesting directlink of booko
-    for child in soup.find('div', {'class': 'bookDetailsBox'}).children:
+    try      
+        # fetch the book details by requesting directlink of booko
+        for child in soup.find('div', {'class': 'bookDetailsBox'}).children:
+            
+            # check if the parsed content (child) is NavigableString
+            if isinstance(child, NavigableString):
+                continue
 
-        # check if the parsed content (child) is NavigableString
-        if isinstance(child, NavigableString):
-            continue
+            # check if the parsed content (child) is Tag
+            if isinstance(child, Tag):
 
-        # check if the parsed content (child) is Tag
-        if isinstance(child, Tag):
+                # get the keys and values
+                metadata = soup.find('div', {'class': child['class'][1]}).get_text().split()
 
-            # get the keys and values
-            metadata = soup.find(
-                'div', {
-                    'class': child['class'][1]}).get_text().split()
-
-            # create a dictionary
-            metadict[metadata[0].replace(":", "")] = metadata[1]
+                # create a dictionary
+                metadict[metadata[0].replace(":", "")] = metadata[1]
+                
+    except AttributeError as e:
+        print("No Children found!")
 
     # removing ISBN as it is not useful here
     if 'ISBN' in metadict.keys():
@@ -224,9 +226,12 @@ def bookMetaData(dirlink, title):
     # sort the data again for sanity
     metadict = OrderedDict(sorted(metadict.items()))
 
-    # cleaning 'File' and 'Categories' Column
+    # cleaning 'File' column
     metadict['File'] = metadict['File'].replace(",", "")
-    metadict['Categories'] = metadict['Categories'].replace("\\", ",")
+
+    # cleaning 'Categories' column
+    if metadict['Categories']:
+        metadict['Categories'] = metadict['Categories'].replace("\\", ",")
 
     # adding title column to the front of the dictionary
     metadict = OrderedDict([('Title', title)] + list(metadict.items()))
