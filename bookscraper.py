@@ -16,13 +16,15 @@ print(ascii_banner)
 # Join user agents file to the system path
 user_agents_file = os.path.join(os.path.dirname(__file__), 'user_agents.txt')
 
-# Utlity function to get the user agent
+
+# Utility function to get the user agent
 def get_user_agent():
     """
     Load the User Agent File
     """
     user_agent = load_user_agents(uafile=user_agents_file)
     return user_agent
+
 
 # Utility function to get random UserAgent from the file
 def load_user_agents(uafile):
@@ -42,12 +44,13 @@ def load_user_agents(uafile):
     return random.choice(uas)
 
 
-def userMenu():
+def usermenu():
     """
     User Input and Initial Retrieval
     """
 
     # Number of retries after URLError
+    global bs
     retries = 3
     i = 0
 
@@ -61,11 +64,14 @@ def userMenu():
     try:
         print("=" * 40)
         print("Fetching the details...")
-        html = urlopen(Request(url, headers={'User-Agent': get_user_agent()}))
+
+        html = urlopen(Request(url, headers={
+            "Connection": "close",
+            "User-Agent": get_user_agent()}))
         bs = BeautifulSoup(html, 'html.parser')
     except HTTPError as e:
         print(e)
-    except URLError as e:
+    except URLError:
         if i + 1 == retries:
             print('The server could not be found!')
         else:
@@ -75,42 +81,42 @@ def userMenu():
         print("=" * 40)
 
     # getting the total count of results
-    totalResults = bs.find(class_='totalCounter')
-    for number in totalResults.descendants:
-        fileTotal = number.replace("(", "").replace(")", "")
-        if fileTotal == "500+":
+    total_results = bs.find(class_='totalCounter')
+    for number in total_results.descendants:
+        file_total = number.replace("(", "").replace(")", "")
+        if file_total == "500+":
             print(
-                f'There are total of more than {fileTotal.replace("+","")} search results for {query}')
-        elif int(fileTotal) > 0:
-            print(f"There are total {fileTotal} search results for {query}")
+                f'There are total of more than {file_total.replace("+", "")} search results for {query}')
+        elif int(file_total) > 0:
+            print(f"There are total {file_total} search results for {query}")
             print("-" * 40)
         else:
             print("No results!")
 
     # calling function for book link
-    bookLinkRetrieval(bs)
+    book_link_retrieval(bs)
 
 
 # Utility function for Book Title Retrieval and Direct-link Parsing
-def bookLinkRetrieval(bs):
+def book_link_retrieval(soup_object):
     """
     bs : Soup object having parsed HTML for the user query
     """
 
-    i = 0
+    i, retries = 0, 3
 
     # fetching the title and book link
-    for tr in bs.find_all("td"):
-        for td in bs.find_all("h3"):
+    for _ in soup_object.find_all("td"):
+        for td in soup_object.find_all("h3"):
             for ts in td.find_all("a"):
                 title = ts.get_text()
 
             for ts in td.find_all('a', attrs={'href': re.compile("^/book/")}):
                 ref = ts.get('href')
-                BookLink = "https://b-ok.asia" + ref
+                book_link = "https://b-ok.asia" + ref
 
-            print("Title of the book: " + title+"\n")
-            print("Book link: " + BookLink)
+            print("Title of the book: " + title + "\n")
+            print("Book link: " + book_link)
             print("=" * 40)
 
             # request the book page link for fetching direct download link
@@ -118,12 +124,13 @@ def bookLinkRetrieval(bs):
                 print("Fetching direct link to the book...")
                 request = urlopen(
                     Request(
-                        BookLink, headers={
-                            'User-Agent': get_user_agent()})).read()
-                soup = BeautifulSoup(request, 'html.parser')
+                        book_link, headers={
+                            "Connection": "close",
+                            "User-Agent": get_user_agent()})).read()
+                sp = BeautifulSoup(request, 'html.parser')
             except HTTPError as e:
                 print(e)
-            except URLError as e:
+            except URLError:
                 if i + 1 == retries:
                     print('The server could not be found!')
                 else:
@@ -132,36 +139,39 @@ def bookLinkRetrieval(bs):
                 print("Link fetched!")
 
             # get the direct link to the book
-            for link in soup.findAll('a', attrs={'href': re.compile("^/dl/")}):
-                urlTrail = link.get('href')
-                dirlink = "https://b-ok.asia" + urlTrail
+            for link in sp.findAll('a', attrs={'href': re.compile("^/dl/")}):
+                url_trail = link.get('href')
+                dir_link = "https://b-ok.asia" + url_trail
 
-            print(f"Direct Link: {dirlink}")
+            print(f"Direct Link: {dir_link}")
 
             # calling bookMetaData for fetching book details
-            bookMetaData(dirlink, title)
+            book_meta_data(dir_link, title)
 
 
 # Function to fetch book metadata and create excel file
-def bookMetaData(dirlink, title):
+def book_meta_data(direct_link, title):
     """
-    dirlink: Direct link to the book
+    direct_link: Direct link to the book
     title: Title of the book
     """
-    i=0
-                
+
+    global soup
+    i, retries = 0, 3
+
     # fetching the metadata for each of the books
     try:
         print("=" * 40)
         print("Fetching book metadata...")
         request = urlopen(
             Request(
-                dirlink, headers={
-                    'User-Agent': get_user_agent()})).read()
+                direct_link, headers={
+                    "Connection": "close",
+                    "User-Agent": get_user_agent()})).read()
         soup = BeautifulSoup(request, 'html.parser')
     except HTTPError as e:
         print(e)
-    except URLError as e:
+    except URLError:
         if i + 1 == retries:
             print('The server could not be found!')
         else:
@@ -181,24 +191,23 @@ def bookMetaData(dirlink, title):
         "Publisher",
         "Year"]
 
-    try:    
-        # fetch the book details by requesting directlink of booko
+    try:
+        # fetch the book details by requesting direct link of books
         for child in soup.find('div', {'class': 'bookDetailsBox'}).children:
-            
+
             # check if the parsed content (child) is NavigableString
             if isinstance(child, NavigableString):
                 continue
 
             # check if the parsed content (child) is Tag
             if isinstance(child, Tag):
-
                 # get the keys and values
                 metadata = soup.find('div', {'class': child['class'][1]}).get_text().split()
 
                 # create a dictionary
                 metadict[metadata[0].replace(":", "")] = metadata[1]
-                
-    except AttributeError as e:
+
+    except AttributeError:
         print("No Children found!")
 
     # removing ISBN as it is not useful here
@@ -213,7 +222,7 @@ def bookMetaData(dirlink, title):
     """
     logic to add NaN values
     """
-    # check if the lenght of columns list and fetched data keys are same
+    # check if the length of columns list and fetched data keys are same
     if len(columns) != len(metadict.keys()):
 
         # if not then find the columns which are not there
@@ -256,7 +265,7 @@ def bookMetaData(dirlink, title):
     print("=" * 40)
 
     # call the download function
-    download(dirlink, title, metadict['File'].replace(",", ""))
+    download(direct_link, title, metadict['File'].replace(",", ""))
 
 
 # Function to download File and Save to Disk
@@ -277,5 +286,4 @@ def download(link, title, extension):
 
 
 if __name__ == "__main__":
-
-    userMenu()
+    usermenu()
