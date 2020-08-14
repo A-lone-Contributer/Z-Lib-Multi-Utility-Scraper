@@ -21,7 +21,7 @@ The data fetched contains the following columns :
 - Title
 - Author
 - Categories
-- File (Type)
+- File (Format)
 - Language
 - Pages (Number of Pages)
 - Publisher
