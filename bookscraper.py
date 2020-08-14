@@ -5,6 +5,7 @@ import re
 import csv
 import time
 import pyfiglet
+import requests
 from collections import OrderedDict
 from urllib.request import urlopen, Request, urlretrieve
 from urllib.error import HTTPError, URLError
@@ -103,6 +104,7 @@ def book_link_retrieval(soup_object):
     bs : Soup object having parsed HTML for the user query
     """
 
+    global sp, dir_link
     i, retries = 0, 3
 
     # fetching the title and book link
@@ -118,6 +120,11 @@ def book_link_retrieval(soup_object):
             print("Title of the book: " + title + "\n")
             print("Book link: " + book_link)
             print("=" * 40)
+
+            # Fetching name of the author
+            data = requests.request('get', book_link)  # any website
+            s = BeautifulSoup(data.text, 'html.parser')
+            author = s.find('a', {'class': 'color1'}).get_text()
 
             # request the book page link for fetching direct download link
             try:
@@ -146,11 +153,11 @@ def book_link_retrieval(soup_object):
             print(f"Direct Link: {dir_link}")
 
             # calling bookMetaData for fetching book details
-            book_meta_data(dir_link, title)
+            book_meta_data(dir_link, title, author)
 
 
 # Function to fetch book metadata and create excel file
-def book_meta_data(direct_link, title):
+def book_meta_data(direct_link, book_title, author_name):
     """
     direct_link: Direct link to the book
     title: Title of the book
@@ -239,11 +246,14 @@ def book_meta_data(direct_link, title):
     metadict['File'] = metadict['File'].replace(",", "")
 
     # cleaning 'Categories' column
-    if metadict['Categories']:
-        metadict['Categories'] = metadict['Categories'].replace("\\", ",")
+    if 'Categories' in metadict.keys():
+        metadict['Categories'] = metadict['Categories'].replace("\\\\", ",")
+
+    # adding author column to the front of the dictionary
+    metadict = OrderedDict([('Author', author_name)] + list(metadict.items()))
 
     # adding title column to the front of the dictionary
-    metadict = OrderedDict([('Title', title)] + list(metadict.items()))
+    metadict = OrderedDict([('Title', book_title)] + list(metadict.items()))
 
     csv_file = "metadata.csv"  # name of the csv file
 
@@ -265,7 +275,7 @@ def book_meta_data(direct_link, title):
     print("=" * 40)
 
     # call the download function
-    download(direct_link, title, metadict['File'].replace(",", ""))
+    download(direct_link, book_title, metadict['File'].replace(",", ""))
 
 
 # Function to download File and Save to Disk
