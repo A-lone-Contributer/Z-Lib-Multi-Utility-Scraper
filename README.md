@@ -19,6 +19,7 @@ Note that, this scraper is just for b-ok.asia but it is very easy to switch to b
 
 The data fetched contains the following columns :
 - Title
+- Author
 - Categories
 - File (Type)
 - Language
