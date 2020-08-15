@@ -29,6 +29,16 @@ The data fetched contains the following columns :
 
 ### File
 
-Book is downloaded based on user confirmation. The file format is either epub or pdf.
+Book is downloaded based on user confirmation. For downloading, scraper uses selenium and opens browser to click the download link. We can avoid opening of browser using --headless option but as the books have a download limit thus this method is not preferrable.
 
 **Note:** One book is uploaded for sample and not all the books - for obvious reasons.
+
+## Requirements
+
+- Python >=3.6 
+- Selenium
+- Chromedriver
+- pyfiglet
+- urllib
+- requests
+- bs4
