@@ -10,6 +10,8 @@ from collections import OrderedDict
 from urllib.request import urlopen, Request, urlretrieve
 from urllib.error import HTTPError, URLError
 from bs4 import BeautifulSoup, NavigableString, Tag
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 
 ascii_banner = pyfiglet.figlet_format("Z-LIB BOOK SCRAPER")
 print(ascii_banner)
@@ -126,41 +128,16 @@ def book_link_retrieval(soup_object):
             s = BeautifulSoup(data.text, 'html.parser')
             author = s.find('a', {'class': 'color1'}).get_text()
 
-            # request the book page link for fetching direct download link
-            try:
-                print("Fetching direct link to the book...")
-                request = urlopen(
-                    Request(
-                        book_link, headers={
-                            "Connection": "close",
-                            "User-Agent": get_user_agent()})).read()
-                sp = BeautifulSoup(request, 'html.parser')
-            except HTTPError as e:
-                print(e)
-            except URLError:
-                if i + 1 == retries:
-                    print('The server could not be found!')
-                else:
-                    time.sleep(42)
-            else:
-                print("Link fetched!")
-
-            # get the direct link to the book
-            for link in sp.findAll('a', attrs={'href': re.compile("^/dl/")}):
-                url_trail = link.get('href')
-                dir_link = "https://b-ok.asia" + url_trail
-
-            print(f"Direct Link: {dir_link}")
-
             # calling bookMetaData for fetching book details
-            book_meta_data(dir_link, title, author)
+            book_meta_data(book_link, title, author)
 
 
 # Function to fetch book metadata and create excel file
-def book_meta_data(direct_link, book_title, author_name):
+def book_meta_data(book_link, book_title, author_name):
     """
-    direct_link: Direct link to the book
-    title: Title of the book
+    book_link: Direct link to the book
+    book_title: Title of the book
+    author_name: Name of the author
     """
 
     global soup
@@ -168,11 +145,10 @@ def book_meta_data(direct_link, book_title, author_name):
 
     # fetching the metadata for each of the books
     try:
-        print("=" * 40)
         print("Fetching book metadata...")
         request = urlopen(
             Request(
-                direct_link, headers={
+                book_link, headers={
                     "Connection": "close",
                     "User-Agent": get_user_agent()})).read()
         soup = BeautifulSoup(request, 'html.parser')
@@ -275,24 +251,38 @@ def book_meta_data(direct_link, book_title, author_name):
     print("=" * 40)
 
     # call the download function
-    download(direct_link, book_title, metadict['File'].replace(",", ""))
+    download(book_link)
 
 
-# Function to download File and Save to Disk
-def download(link, title, extension):
+# Helper function to launch browser
+def launchBrowser(link):
+    chrome_options = Options()
+    chrome_options.add_argument("start-maximized")
+    driver = webdriver.Chrome(executable_path="chromedriver.exe", options=chrome_options)
+    driver.get(link)
+
+    return driver
+
+
+# Function to download File and save to disk
+def download(link):
     """
     link : Direct link to the book
-    title : Title of the book
-    extension : extension of the file (epub/pdf etc)
     """
 
     confirmation = input("Do you want to download this book? (Y/N) ").lower()
 
+    print("There is a download limit of 5, so if the file doesn't download then check your limit.")
+
     # if user inputs 'y' then download the file
     if confirmation == 'y':
-        output_file = title + "." + extension.lower()
-        urlretrieve(link, output_file)
-        print("Book Download Complete!")
+        print("Downloading file....")
+        driver = launchBrowser(link)
+
+        # clicking the download button
+        driver.find_element_by_class_name("addDownloadedBook").click()
+
+        print("Downloaded!")
 
 
 if __name__ == "__main__":
