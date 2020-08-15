@@ -7,7 +7,7 @@ import time
 import pyfiglet
 import requests
 from collections import OrderedDict
-from urllib.request import urlopen, Request, urlretrieve
+from urllib.request import urlopen, Request
 from urllib.error import HTTPError, URLError
 from bs4 import BeautifulSoup, NavigableString, Tag
 from selenium import webdriver
@@ -255,7 +255,11 @@ def book_meta_data(book_link, book_title, author_name):
 
 
 # Helper function to launch browser
-def launchBrowser(link):
+def launch_browser(link):
+    """
+    link : Direct link to the book
+    """
+    
     chrome_options = Options()
     chrome_options.add_argument("start-maximized")
     driver = webdriver.Chrome(executable_path="chromedriver.exe", options=chrome_options)
@@ -277,10 +281,16 @@ def download(link):
     # if user inputs 'y' then download the file
     if confirmation == 'y':
         print("Downloading file....")
-        driver = launchBrowser(link)
+        driver = launch_browser(link)
 
         # clicking the download button
         driver.find_element_by_class_name("addDownloadedBook").click()
+
+        # timer for chrome to download the file
+        time.sleep(100)
+
+        # close the driver
+        driver.close()
 
         print("Downloaded!")
 
