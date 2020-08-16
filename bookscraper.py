@@ -103,7 +103,7 @@ def usermenu():
 # Utility function for Book Title Retrieval and Direct-link Parsing
 def book_link_retrieval(soup_object):
     """
-    bs : Soup object having parsed HTML for the user query
+    soup_object : Soup object having parsed HTML for the user query
     """
 
     global sp, dir_link
